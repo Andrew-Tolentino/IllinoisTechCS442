@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MultiNotePad</string>
+    <string name="notes_file">NotesFile</string>
+    <string name="encoding">UTF-8</string>
 </resources>

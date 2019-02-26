@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#72bcd4"
+    android:background="#6360FF"
     tools:context=".EditActivity">
 
     <EditText
@@ -16,7 +16,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:background="#ffffff"
+        android:background="#AED6F1"
         android:ems="10"
         android:hint="Note Title"
         android:inputType="text"
@@ -34,7 +34,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        android:background="#ffffff"
+        android:background="#AED6F1"
         android:ems="10"
         android:gravity="top"
         android:hint="Note Body"

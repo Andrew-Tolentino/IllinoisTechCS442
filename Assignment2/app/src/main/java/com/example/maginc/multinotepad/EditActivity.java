@@ -12,11 +12,12 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 public class EditActivity extends AppCompatActivity {
 
     private EditText title;
     private EditText body;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,13 @@ public class EditActivity extends AppCompatActivity {
 
         // Set the scrolling motion for the body
         body.setMovementMethod(new ScrollingMovementMethod());
+
+        // Check if the intent passed by Main Activity contains any values. If so that means the user wishes to edit a note
+        Intent intent = getIntent();
+        if (intent.getExtras() != null) {
+            title.setText(intent.getStringExtra("TITLE"));
+            body.setText(intent.getStringExtra("BODY"));
+        }
     }
 
     @Override
@@ -60,11 +68,36 @@ public class EditActivity extends AppCompatActivity {
             }
             // Save the note
             else {
-                goToMainActivity.putExtra("NEW_TITLE", title.getText().toString());
-                goToMainActivity.putExtra("NEW_BODY", body.getText().toString());
-                setResult(0, goToMainActivity);
-                finish();
-                Toast.makeText(this, "Note Saved!", Toast.LENGTH_SHORT).show();
+                Intent intent = getIntent();
+
+                // User wished to edit a previous note. Check if they made any new changes to it
+                if (intent.getExtras() != null) {
+                    String currTitle = title.getText().toString();
+                    String currBody = body.getText().toString();
+
+                    // If the user did not make any changes
+                    if (currTitle.equals(intent.getStringExtra("TITLE")) && currBody.equals(intent.getStringExtra("BODY"))) {
+                        setResult(-1, goToMainActivity);
+                        finish();
+                    }
+
+                    // If the user made changes
+                    else {
+                        goToMainActivity.putExtra("CHANGE_TITLE", title.getText().toString());
+                        goToMainActivity.putExtra("CHANGE_BODY", body.getText().toString());
+                        setResult(0, goToMainActivity);
+                        finish();
+                    }
+
+                }
+
+                // User wishes to create a new note
+                else {
+                    goToMainActivity.putExtra("CHANGE_TITLE", title.getText().toString());
+                    goToMainActivity.putExtra("CHANGE_BODY", body.getText().toString());
+                    setResult(0, goToMainActivity);
+                    finish();
+                }
 
             }
         }
@@ -75,36 +108,106 @@ public class EditActivity extends AppCompatActivity {
     public void onBackPressed() {
         // If title of note is empty
         if (title.getText().toString().isEmpty()) {
-            Toast.makeText(EditActivity.this, "Not Saved", Toast.LENGTH_SHORT).show();
-            super.onBackPressed();
-
+            Intent goToMainActivity = new Intent();
+            setResult(-1, goToMainActivity);
+            Toast.makeText(this, "The Untitled Note was not saved!", Toast.LENGTH_SHORT).show();
+            finish();
         }
         // If the title of note is not empty
         else {
-            // Set up go back dialog box
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            Intent i = new Intent();
+            Intent intent = getIntent();
 
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(EditActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+            // User wished to edit a previous note
+            if (intent.getExtras() != null) {
+                String currTitle = title.getText().toString();
+                String currBody = body.getText().toString();
+
+                // If the user did not make any changes go back to Main Activity without prompting dialog box
+                if (currTitle.equals(intent.getStringExtra("TITLE")) && currBody.equals(intent.getStringExtra("BODY"))) {
+                    setResult(-1, i);
                     finish();
                 }
-            });
 
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(EditActivity.this, "No from Dialog", Toast.LENGTH_SHORT).show();
-                    finish();
+                // If the user did make changes show dialog box
+                else {
+                    // Set up go back dialog box
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
+                    // If user would like to save note
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent goToMainActivity = new Intent();
+                            goToMainActivity.putExtra("CHANGE_TITLE", title.getText().toString());
+                            goToMainActivity.putExtra("CHANGE_BODY", body.getText().toString());
+                            setResult(0, goToMainActivity);
+                            finish();
+                        }
+                    });
+
+                    // If user would not like to save note
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent goToMainActivity = new Intent();
+                            setResult(-1, goToMainActivity);
+                            finish();
+
+                        }
+                    });
+
+                    // Body for dialog box
+                    builder.setMessage("Save note " + "'" + title.getText().toString() + "'");
+
+                    // Title for dialog box
+                    builder.setTitle("Your note is not saved!");
+
+                    // Instantiate an Alert Dialog and display it on the screen
+                    AlertDialog goBackDialog = builder.create();
+                    goBackDialog.show();
                 }
-            });
+            }
 
-            builder.setMessage("Save note");
-            builder.setTitle("Your note is not saved!");
-            AlertDialog goBackDialog = builder.create();
-            goBackDialog.show();
+            // User wishes to save a new note
+            else {
+                // Set up go back dialog box
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                // If user would like to save note
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent goToMainActivity = new Intent();
+                        goToMainActivity.putExtra("CHANGE_TITLE", title.getText().toString());
+                        goToMainActivity.putExtra("CHANGE_BODY", body.getText().toString());
+                        setResult(0, goToMainActivity);
+                        finish();
+                    }
+                });
+
+                // If user would not like to save note
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent goToMainActivity = new Intent();
+                        setResult(-1, goToMainActivity);
+                        finish();
+
+                    }
+                });
+
+                // Body for dialog box
+                builder.setMessage("Save note " + "'" + title.getText().toString() + "'");
+
+                // Title for dialog box
+                builder.setTitle("Your note is not saved!");
+
+                // Instantiate an Alert Dialog and display it on the screen
+                AlertDialog goBackDialog = builder.create();
+                goBackDialog.show();
+            }
+
         }
 
     }
