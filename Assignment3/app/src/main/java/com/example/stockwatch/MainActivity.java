@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     // Set title
                     builderDuplicate.setTitle("Duplicate Stock");
 
-                    // Set Message
+                    // Set message
                     builderDuplicate.setMessage("Stock Symbol " + input + " is already displayed");
 
                     // Create dialog and display
